@@ -1,0 +1,3 @@
+[workspace]
+members = ["arb_comp05", "egui_hex02"]
+resolver = "2"
