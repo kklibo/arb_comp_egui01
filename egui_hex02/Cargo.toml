@@ -20,6 +20,8 @@ eframe = { version = "0.27.0", default-features = false, features = [
 ] }
 log = "0.4"
 
+arb_comp05 = {path = "../arb_comp05"}
+
 # You only need serde if you want app persistence:
 serde = { version = "1", features = ["derive"] }
 egui_extras = "0.27.2"

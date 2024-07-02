@@ -1,10 +1,4 @@
-//duplicated from yew_hex02/arb_comp04
-#[derive(Debug, Clone, Copy, PartialEq)]
-pub enum HexCell {
-    Same { value: u8, source_id: usize },
-    Diff { value: u8, source_id: usize },
-    Blank,
-}
+pub use arb_comp05::test_utils::HexCell;
 
 pub fn get_diffs(
     a: &[u8],
