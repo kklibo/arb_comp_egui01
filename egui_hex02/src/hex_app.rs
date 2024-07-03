@@ -16,6 +16,12 @@ fn drop_select_text(selected: bool) -> &'static str {
     }
 }
 
+#[derive(Debug, PartialEq)]
+enum DiffMethod {
+    ByIndex,
+    BpeGreedy00,
+}
+
 pub struct HexApp {
     source_name0: Option<String>,
     source_name1: Option<String>,
@@ -24,6 +30,7 @@ pub struct HexApp {
     diffs0: Vec<HexCell>,
     diffs1: Vec<HexCell>,
     file_drop_target: WhichFile,
+    diff_method: DiffMethod,
 }
 
 fn random_pattern() -> Vec<u8> {
@@ -41,6 +48,7 @@ impl HexApp {
             diffs0: vec![],
             diffs1: vec![],
             file_drop_target: WhichFile::File0,
+            diff_method: DiffMethod::ByIndex,
         };
 
         result.update_diffs();
@@ -50,7 +58,10 @@ impl HexApp {
     fn update_diffs(&mut self) {
         let (diffs1, diffs2) =
             if let (Some(pattern0), Some(pattern1)) = (&self.pattern0, &self.pattern1) {
-                diff::get_diffs(pattern0, pattern1, 0..100 * 16)
+                match self.diff_method {
+                    DiffMethod::ByIndex => diff::get_diffs(pattern0, pattern1, 0..100 * 16),
+                    DiffMethod::BpeGreedy00 => unimplemented!(),
+                }
             } else {
                 (vec![], vec![])
             };
@@ -177,7 +188,25 @@ impl eframe::App for HexApp {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("hex diff test (egui UI)");
+            ui.horizontal(|ui| {
+                ui.heading("hex diff test (egui UI)");
+
+                ui.label("diff method:");
+                use DiffMethod::*;
+                if ui
+                    .selectable_value(&mut self.diff_method, ByIndex, "By Index")
+                    .clicked()
+                {
+                    self.update_diffs();
+                }
+
+                if ui
+                    .selectable_value(&mut self.diff_method, BpeGreedy00, "BPE Greedy 00")
+                    .clicked()
+                {
+                    self.update_diffs();
+                }
+            });
 
             TableBuilder::new(ui)
                 .cell_layout(egui::Layout::left_to_right(egui::Align::Center))
