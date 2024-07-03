@@ -1,4 +1,5 @@
 pub mod bpe;
+pub mod diff;
 pub mod matcher;
 mod pairs;
 pub mod recode;

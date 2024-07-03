@@ -1,4 +1,4 @@
-pub use arb_comp05::test_utils::HexCell;
+pub use crate::test_utils::HexCell;
 
 pub fn get_diffs(
     a: &[u8],
