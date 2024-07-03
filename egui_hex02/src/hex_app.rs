@@ -1,4 +1,5 @@
 use crate::diff::{self, HexCell};
+use arb_comp05::{bpe::Bpe, matcher, test_utils};
 use egui::{Color32, RichText, Ui};
 use egui_extras::{Column, TableBody, TableBuilder, TableRow};
 use rand::Rng;
@@ -60,7 +61,15 @@ impl HexApp {
             if let (Some(pattern0), Some(pattern1)) = (&self.pattern0, &self.pattern1) {
                 match self.diff_method {
                     DiffMethod::ByIndex => diff::get_diffs(pattern0, pattern1, 0..100 * 16),
-                    DiffMethod::BpeGreedy00 => unimplemented!(),
+                    DiffMethod::BpeGreedy00 => {
+                        let bpe = Bpe::new(&[pattern0, pattern1]);
+
+                        let pattern0 = bpe.encode(pattern0);
+                        let pattern1 = bpe.encode(pattern1);
+
+                        let matches = matcher::greedy00(&pattern0, &pattern1);
+                        test_utils::matches_to_cells(&matches, |x| bpe.decode(x.clone()))
+                    }
                 }
             } else {
                 (vec![], vec![])
