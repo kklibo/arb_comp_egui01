@@ -59,8 +59,9 @@ impl HexApp {
     fn update_diffs(&mut self) {
         let (diffs1, diffs2) =
             if let (Some(pattern0), Some(pattern1)) = (&self.pattern0, &self.pattern1) {
+                let len = std::cmp::max(pattern0.len(), pattern1.len());
                 match self.diff_method {
-                    DiffMethod::ByIndex => diff::get_diffs(pattern0, pattern1, 0..100 * 16),
+                    DiffMethod::ByIndex => diff::get_diffs(pattern0, pattern1, 0..len),
                     DiffMethod::BpeGreedy00 => {
                         let bpe = Bpe::new(&[pattern0, pattern1]);
 
