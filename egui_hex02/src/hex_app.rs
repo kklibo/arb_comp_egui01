@@ -111,6 +111,18 @@ impl HexApp {
     }
 
     fn add_body_contents(&self, body: TableBody<'_>) {
+        fn color(c: usize) -> Color32 {
+            match c % 6 {
+                0 => Color32::RED,
+                1 => Color32::YELLOW,
+                2 => Color32::GREEN,
+                3 => Color32::from_rgb(0, 255, 255),
+                4 => Color32::BLUE,
+                5 => Color32::from_rgb(255, 0, 255),
+                _ => unreachable!(),
+            }
+        }
+
         let hex_grid_width = 16;
 
         let row_height = 18.0;
@@ -128,12 +140,9 @@ impl HexApp {
                             value,
                             source_id: _,
                         }) => ui.label(RichText::new(format!("{value:02X}")).monospace()),
-                        Some(&HexCell::Diff {
-                            value,
-                            source_id: _,
-                        }) => ui.label(
+                        Some(&HexCell::Diff { value, source_id }) => ui.label(
                             RichText::new(format!("{value:02X}"))
-                                .color(Color32::from_rgb(192, 64, 64))
+                                .color(color(source_id))
                                 .monospace(),
                         ),
 
