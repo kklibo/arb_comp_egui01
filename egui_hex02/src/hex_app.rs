@@ -112,15 +112,24 @@ impl HexApp {
 
     fn add_body_contents(&self, body: TableBody<'_>) {
         fn color(c: usize) -> Color32 {
+            let hi: u8 = 192;
+            let lo: u8 = 64;
             match c % 6 {
-                0 => Color32::RED,
-                1 => Color32::YELLOW,
-                2 => Color32::GREEN,
-                3 => Color32::from_rgb(0, 255, 255),
-                4 => Color32::BLUE,
-                5 => Color32::from_rgb(255, 0, 255),
+                0 => Color32::from_rgb(hi, lo, lo),
+                1 => Color32::from_rgb(hi, hi, lo),
+                2 => Color32::from_rgb(lo, hi, lo),
+                3 => Color32::from_rgb(lo, hi, hi),
+                4 => Color32::from_rgb(lo, lo, hi),
+                5 => Color32::from_rgb(hi, lo, hi),
                 _ => unreachable!(),
             }
+        }
+        fn contrast(color: Color32) -> Color32 {
+            Color32::from_rgb(
+                u8::wrapping_add(color.r(), 128),
+                u8::wrapping_add(color.g(), 128),
+                u8::wrapping_add(color.b(), 128),
+            )
         }
 
         let hex_grid_width = 16;
@@ -136,15 +145,21 @@ impl HexApp {
                     let cell = diffs.get(i + row_index * hex_grid_width);
 
                     match cell {
-                        Some(&HexCell::Same {
-                            value,
-                            source_id: _,
-                        }) => ui.label(RichText::new(format!("{value:02X}")).monospace()),
-                        Some(&HexCell::Diff { value, source_id }) => ui.label(
+                        Some(&HexCell::Same { value, source_id }) => ui.label(
                             RichText::new(format!("{value:02X}"))
                                 .color(color(source_id))
                                 .monospace(),
                         ),
+                        Some(&HexCell::Diff { value, source_id }) => {
+                            let color = color(source_id);
+                            let contrast = contrast(color);
+                            ui.label(
+                                RichText::new(format!("{value:02X}"))
+                                    .color(contrast)
+                                    .background_color(color)
+                                    .monospace(),
+                            )
+                        }
 
                         Some(&HexCell::Blank) => ui.monospace("__"),
                         None => ui.monospace("xx"),
@@ -157,18 +172,22 @@ impl HexApp {
                     let cell = diffs.get(i + row_index * hex_grid_width);
 
                     match cell {
-                        Some(&HexCell::Same {
-                            value,
-                            source_id: _,
-                        }) => ui.label(RichText::new(format!("{}", value as char)).monospace()),
-                        Some(&HexCell::Diff {
-                            value,
-                            source_id: _,
-                        }) => ui.label(
+                        Some(&HexCell::Same { value, source_id }) => ui.label(
                             RichText::new(format!("{}", value as char))
-                                .color(Color32::from_rgb(192, 64, 64))
+                                .color(color(source_id))
                                 .monospace(),
                         ),
+                        Some(&HexCell::Diff { value, source_id }) => {
+                            let color = color(source_id);
+                            let contrast = contrast(color);
+
+                            ui.label(
+                                RichText::new(format!("{}", value as char))
+                                    .color(contrast)
+                                    .background_color(color)
+                                    .monospace(),
+                            )
+                        }
                         Some(&HexCell::Blank) => ui.monospace("_"),
                         None => ui.monospace("x"),
                     };
