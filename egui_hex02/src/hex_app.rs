@@ -112,8 +112,8 @@ impl HexApp {
 
     fn add_body_contents(&self, body: TableBody<'_>) {
         fn color(c: usize) -> Color32 {
-            let hi: u8 = 192;
-            let lo: u8 = 64;
+            let hi: u8 = 255;
+            let lo: u8 = 128;
             match c % 6 {
                 0 => Color32::from_rgb(hi, lo, lo),
                 1 => Color32::from_rgb(hi, hi, lo),
